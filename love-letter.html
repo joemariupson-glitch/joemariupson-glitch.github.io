@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For You 💌</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b0b12;
+      --ink: #12121a;
+      --paper: #fffaf3;
+      --accent: #ff3b6b;
+      --accent-2: #ffd166;
+      --muted: #9aa0a6;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 70% 20%, #1a1a27 0%, var(--bg) 60%) fixed;
+      color:#fff;
+      overflow-x:hidden;
+    }
+
+    /* Floating hearts background */
+    .hearts{position:fixed;inset:0;pointer-events:none;z-index:0;filter: drop-shadow(0 6px 12px rgba(0,0,0,.35));}
+
+    .wrap{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:40px 16px}
+
+    .card{
+      width:min(820px, 92vw);
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.9)) , url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 40 40" opacity=".06"><path fill="%23ff3b6b" d="M20 6c-2.8-6-12-4-12 3 0 8 12 15 12 15s12-7 12-15c0-7-9-9-12-3z"/></svg>');
+      color: var(--ink);
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+
+    .ribbon{
+      background: linear-gradient(120deg, var(--accent), #ff7a9b 60%, #ffa3bd);
+      padding: 14px 22px;
+      color:white;
+      letter-spacing:.06em;
+      font-weight:700;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+
+    .inner{display:grid;grid-template-columns: 1.3fr 1fr;gap:0;}
+    @media (max-width: 900px){.inner{grid-template-columns:1fr}}
+
+    .left{
+      padding: 28px 28px 20px 28px;
+      background: var(--paper);
+    }
+
+    .right{
+      padding: 28px; display:grid; align-content:center; gap:18px;
+      background: linear-gradient(180deg, rgba(255,59,107,.06), rgba(255,59,107,.14));
+    }
+
+    h1{
+      margin:10px 0 0; font-family: "Playfair Display", serif; font-size: clamp(28px, 5vw, 48px); line-height:1.1; color:#e11d48
+    }
+    .sub{color:#b91c1c; font-weight:600; letter-spacing:.02em}
+
+    .letter{
+      background: white; border-radius: 20px; padding: 22px 20px; margin-top: 14px; position:relative; overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .paper-lines{position:absolute; inset:0; background: repeating-linear-gradient( to bottom, transparent 0 32px, rgba(59,130,246,.15) 32px 33px ); pointer-events:none}
+
+    .to-from{display:flex; gap:16px; flex-wrap:wrap; font-size:14px; color:#6b7280}
+    .to-from span{background:#f3f4f6; padding:6px 10px; border-radius:999px}
+
+    .msg{font-size: clamp(14px, 2vw, 17px); line-height:1.85; margin: 14px 2px 8px; color:#0b1020; min-height: 160px; white-space:pre-wrap}
+
+    .controls{display:flex; flex-wrap:wrap; gap:10px; margin-top: 14px}
+    .btn{
+      appearance:none;border:0;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;transition:.2s transform,.2s box-shadow; display:inline-flex; align-items:center; gap:10px; box-shadow: 0 6px 14px rgba(0,0,0,.15)
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn.primary{background:var(--accent); color:white}
+    .btn.ghost{background:white}
+    .btn.flat{background:transparent; box-shadow:none; color:#b91c1c}
+
+    .hint{font-size:12px; color:#6b7280}
+
+    .envelope{position:relative; width:100%; aspect-ratio: 16/9; max-width:420px; margin: 0 auto}
+    .env-body{position:absolute; inset:0; background: linear-gradient(180deg, #ffe2ea, #ffc9d6); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.2)}
+    .env-flap{
+      position:absolute; inset:0; clip-path: polygon(0 0, 100% 0, 50% 60%);
+      background: linear-gradient(180deg, #ff8aa8, #ff5d86); transform-origin: top; transition: .7s transform cubic-bezier(.2,.8,.2,1);
+      border-top-left-radius: 16px; border-top-right-radius: 16px
+    }
+    .envelope.open .env-flap{ transform: rotateX(180deg) }
+
+    .letter-sheet{position:absolute; left:8%; right:8%; bottom:8%; height:70%; background:white; border-radius:12px; transform: translateY(30%) rotate(-1deg); transition:.6s transform cubic-bezier(.2,.8,.2,1), .6s opacity; opacity:.95; box-shadow: 0 10px 30px rgba(0,0,0,.12)}
+    .envelope.open .letter-sheet{ transform: translateY(-18%) rotate(-1deg);}
+
+    .typing{ border-right: 2px solid var(--accent); white-space: pre-wrap; overflow-wrap: anywhere;}
+
+    .mini{font-size:12px; opacity:.8}
+
+    .reply{
+      display:grid; gap:10px; margin-top:8px
+    }
+    textarea{
+      width:100%; min-height:120px; border-radius:14px; padding:12px 14px; border:1px solid #e5e7eb; resize:vertical; font-family:inherit; font-size:14px
+    }
+    input[type="text"]{width:100%; border-radius:999px; padding:10px 14px; border:1px solid #e5e7eb; font-family:inherit}
+
+    .success{display:none; padding:10px 12px; background:#ecfeff; border:1px solid #a5f3fc; color:#155e75; border-radius:12px; font-size:14px}
+    .show{display:block}
+
+    /* Footer */
+    .footer{ text-align:center; color:#9aa0a6; font-size:12px; margin-top: 12px }
+    .footer a{ color:#ffd166 }
+
+    /* Tooltip */
+    .tip{ position:relative; display:inline-block }
+    .tip .tiptext{ visibility:hidden; width:max-content; max-width:260px; background:#1f2937; color:#fff; text-align:center; border-radius:8px; padding:8px 10px; position:absolute; z-index:2; bottom:125%; left:50%; transform:translateX(-50%); opacity:0; transition:opacity .2s }
+    .tip:hover .tiptext{ visibility:visible; opacity:1 }
+
+  </style>
+</head>
+<body>
+  <canvas class="hearts" id="heartsCanvas"></canvas>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="ribbon">Open me</div>
+      <div class="inner">
+        <!-- LEFT: The letter content -->
+        <div class="left">
+          <h1>For <span id="toName">You</span> ❤️</h1>
+          <div class="sub" id="dateLine"></div>
+
+          <div class="letter">
+            <div class="paper-lines"></div>
+            <div class="to-from">
+              <span>To: <strong id="toChip">You</strong></span>
+              <span>From: <strong id="fromChip">Me</strong></span>
+            </div>
+            <div id="message" class="msg typing"></div>
+            <div class="controls">
+              <button class="btn primary" id="openBtn">💌 Open Letter</button>
+              <button class="btn ghost" id="printBtn">🖨️ Print</button>
+              <button class="btn flat tip" id="secretBtn">✨ Secret
+                <span class="tiptext">Psst… try the Konami Code on your keyboard. 😉</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="reply">
+            <div class="mini">Reply to this letter</div>
+            <input type="text" id="yourName" placeholder="Your name" />
+            <textarea id="replyText" placeholder="Write your reply here…"></textarea>
+            <div class="controls">
+              <button class="btn primary" id="saveBtn">📥 Save Reply (.txt)</button>
+              <button class="btn ghost" id="clearBtn">🧹 Clear</button>
+            </div>
+            <div class="success" id="saveMsg">Saved! Check your downloads 🫶</div>
+          </div>
+
+          <div class="footer">Made with <span aria-label="love" role="img">💕</span> • You can edit names and the message in the code (see <code>CONFIG</code> at the top of the script).</div>
+        </div>
+
+        <!-- RIGHT: Envelope animation -->
+        <div class="right">
+          <div class="envelope" id="envelope">
+            <div class="env-body"></div>
+            <div class="env-flap"></div>
+            <div class="letter-sheet"></div>
+          </div>
+          <div class="hint">Click <strong>Open Letter</strong> to lift the flap. 🎀</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const CONFIG = {
+  to: "Joanne",            
+  from: "Riri", 
+  lines: [
+    "My Dearest Joanne,",
+    "",
+    "Every time I hear your name, it feels like a poem my heart never stops reciting. Joanne. It lingers in the air like music—soft, graceful, unforgettable.",
+    "",
+    "I may not be the tallest person in the room, but when you’re near, you make me feel like I’m standing on the highest peak. You have this quiet magic, this charm that no words could truly capture. It’s in your smile, in the way your presence lights up the space, and in how every conversation with you feels like a secret treasure I get to keep.",
+    "",
+    "They say love is found in the little things—like the way your laughter echoes in my mind long after the moment has passed, or the way time feels faster whenever you’re around. With you, the ordinary becomes extraordinary. Even silence with you feels like a melody only our hearts can understand.",
+    "",
+    "If I could write the story of us, Joanne, every page would be filled with admiration, humor, sweetness, and a promise: that no matter where life takes us, I’ll always look at you and think, “There goes the most beautiful part of my day.”",
+    "",
+    "Forever enchanted,",
+    "Riri"
+  ],
+  typingSpeed: 28 // ms per character
+};
+
+
+    // ======= Utility =======
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+
+    // ======= Date line =======
+    const now = new Date();
+    const dateLine = now.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+    $('#dateLine').textContent = dateLine;
+
+    // ======= Populate names =======
+    $('#toName').textContent = CONFIG.to || 'You';
+    $('#toChip').textContent = CONFIG.to || 'You';
+    $('#fromChip').textContent = CONFIG.from || 'Me';
+
+    // ======= Typing effect =======
+    const fullText = CONFIG.lines.join("\n\n");
+    const msgEl = $('#message');
+    let idx = 0; let typingTimer; let isTyping = false;
+    function typeNext(){
+      if(idx <= fullText.length){
+        msgEl.textContent = fullText.slice(0, idx);
+        idx++;
+        typingTimer = setTimeout(typeNext, CONFIG.typingSpeed);
+      } else {
+        msgEl.classList.remove('typing');
+        celebrate();
+      }
+    }
+
+    // ======= Envelope control =======
+    const env = $('#envelope');
+    const openBtn = $('#openBtn');
+    openBtn.addEventListener('click', () => {
+      env.classList.add('open');
+      if(!isTyping){ isTyping = true; typeNext(); }
+    });
+
+    // ======= Print =======
+    $('#printBtn').addEventListener('click', () => window.print());
+
+    // ======= Save reply =======
+    function saveText(filename, text){
+      const blob = new Blob([text], {type: 'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    $('#saveBtn').addEventListener('click', () => {
+      const name = $('#yourName').value.trim() || 'Anonymous';
+      const reply = $('#replyText').value.trim() || '(no message)';
+      saveText(`Reply to ${CONFIG.to} — from ${name}.txt`, reply);
+      $('#saveMsg').classList.add('show');
+      setTimeout(()=>$('#saveMsg').classList.remove('show'), 2400);
+    });
+    $('#clearBtn').addEventListener('click', () => { $('#replyText').value=''; });
+
+    // ======= Secret (Konami Code) =======
+    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let pressed = [];
+    window.addEventListener('keydown', (e)=>{
+      pressed.push(e.key);
+      if(pressed.length > KONAMI.length) pressed.shift();
+      if(KONAMI.every((k,i)=>pressed[i]===k)){
+        secretSparkles();
+        pressed = [];
+      }
+    });
+
+    $('#secretBtn').addEventListener('click', secretSparkles);
+
+    // ======= Hearts background =======
+    const canvas = document.getElementById('heartsCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, hearts=[];
+    function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    function spawnHeart(){
+      const x = Math.random()*W;
+      const size = 8 + Math.random()*12;
+      const speed = .3 + Math.random()*1.2;
+      const opacity = .4 + Math.random()*.5;
+      hearts.push({x, y:H+20, size, speed, opacity});
+    }
+
+    function drawHeart(x,y,s,op){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.scale(s/20, s/20);
+      ctx.globalAlpha = op;
+      ctx.beginPath();
+      // heart path
+      ctx.moveTo(0,6);
+      ctx.bezierCurveTo(0,-6, -12,-6, -12,6);
+      ctx.bezierCurveTo(-12,16, 0,22, 0,30);
+      ctx.bezierCurveTo(0,22, 12,16, 12,6);
+      ctx.bezierCurveTo(12,-6, 0,-6, 0,6);
+      ctx.fillStyle = '#ff3b6b';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function loop(){
+      ctx.clearRect(0,0,W,H);
+      if(Math.random() < 0.4) spawnHeart();
+      hearts.forEach(h=>{ h.y -= h.speed; drawHeart(h.x,h.y,h.size,h.opacity); });
+      hearts = hearts.filter(h=>h.y>-40);
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    // ======= Celebrations =======
+    function celebrate(){
+      // go gentle confetti after typing done
+      burst(120);
+    }
+
+    function secretSparkles(){ burst(220); }
+
+    function burst(n=120){
+      const conf = document.createElement('canvas');
+      conf.style.position = 'fixed';
+      conf.style.inset = '0';
+      conf.style.pointerEvents = 'none';
+      conf.width = innerWidth; conf.height = innerHeight;
+      document.body.appendChild(conf);
+      const cx = conf.getContext('2d');
+      const pieces = Array.from({length:n}, ()=>({
+        x: innerWidth/2, y: innerHeight/3, 
+        vx: (Math.random()-0.5)*8, vy: (Math.random()*-6)-2,
+        g: .15 + Math.random()*0.15,
+        s: 2 + Math.random()*5,
+        r: Math.random()*Math.PI,
+        vr: (Math.random()-0.5)*0.2,
+        col: `hsl(${Math.floor(Math.random()*360)}, 90%, 60%)`
+      }));
+
+      let t=0; const maxT = 480;
+      (function anim(){
+        cx.clearRect(0,0,conf.width, conf.height);
+        pieces.forEach(p=>{
+          p.vy += p.g; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+          cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r);
+          cx.fillStyle = p.col; cx.fillRect(-p.s/2,-p.s/2,p.s,p.s); cx.restore();
+        });
+        t++;
+        if(t<maxT) requestAnimationFrame(anim); else conf.remove();
+      })();
+    }
+  </script>
+</body>
+</html>
